@@ -59,34 +59,48 @@ class BlurSuite extends FunSuite {
     check(2, 2, 0)
   }
 
-  test("VerticalBoxBlur.blur with radius 2 should correctly blur the entire " +
+  test("VerticalBoxBlur.blur and parBlur with radius 2 should correctly blur the entire " +
     "4x3 image") {
     val w = 4
     val h = 3
     val src = new Img(w, h)
-    val dst = new Img(w, h)
+    val sequentialDest = new Img(w, h)
+    val parallelDest = new Img(w, h)
     src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2; src(3, 0) = 9
     src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5; src(3, 1) = 10
     src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8; src(3, 2) = 11
 
-    VerticalBoxBlur.blur(src, dst, 0, 4, 2)
+    VerticalBoxBlur.blur(src, sequentialDest, 0, 4, 2)
+    VerticalBoxBlur.parBlur(src, parallelDest, 2, 2)
 
-    def check(x: Int, y: Int, expected: Int) =
-      assert(dst(x, y) == expected,
+    def check(x: Int, y: Int, dest: Img, expected: Int) =
+      assert(dest(x, y) == expected,
         s"(destination($x, $y) should be $expected)")
 
-    check(0, 0, 4)
-    check(1, 0, 5)
-    check(2, 0, 5)
-    check(3, 0, 6)
-    check(0, 1, 4)
-    check(1, 1, 5)
-    check(2, 1, 5)
-    check(3, 1, 6)
-    check(0, 2, 4)
-    check(1, 2, 5)
-    check(2, 2, 5)
-    check(3, 2, 6)
+    check(0, 0, sequentialDest, 4)
+    check(0, 0, parallelDest, 4)
+    check(1, 0, sequentialDest, 5)
+    check(1, 0, parallelDest, 5)
+    check(2, 0, sequentialDest, 5)
+    check(2, 0, parallelDest, 5)
+    check(3, 0, sequentialDest, 6)
+    check(3, 0, parallelDest, 6)
+    check(0, 1, sequentialDest, 4)
+    check(0, 1, parallelDest, 4)
+    check(1, 1, sequentialDest, 5)
+    check(1, 1, parallelDest, 5)
+    check(2, 1, sequentialDest, 5)
+    check(2, 1, parallelDest, 5)
+    check(3, 1, sequentialDest, 6)
+    check(3, 1, parallelDest, 6)
+    check(0, 2, sequentialDest, 4)
+    check(0, 2, parallelDest, 4)
+    check(1, 2, sequentialDest, 5)
+    check(1, 2, parallelDest, 5)
+    check(2, 2, sequentialDest, 5)
+    check(2, 2, parallelDest, 5)
+    check(3, 2, sequentialDest, 6)
+    check(3, 2, parallelDest, 6)
   }
 
 
