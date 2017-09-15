@@ -37,26 +37,37 @@ class BlurSuite extends FunSuite {
     val w = 3
     val h = 3
     val src = new Img(w, h)
-    val dst = new Img(w, h)
+    val sequentialDest = new Img(w, h)
+    val parallelDest = new Img(w, h)
     src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2
     src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5
     src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8
 
-    HorizontalBoxBlur.blur(src, dst, 0, 2, 1)
+    HorizontalBoxBlur.blur(src, sequentialDest, 0, 2, 1)
+    HorizontalBoxBlur.blur(src, parallelDest, 0, 2, 1)
 
-    def check(x: Int, y: Int, expected: Int) =
-      assert(dst(x, y) == expected,
+    def check(x: Int, y: Int, dest: Img, expected: Int) =
+      assert(dest(x, y) == expected,
         s"(destination($x, $y) should be $expected)")
 
-    check(0, 0, 2)
-    check(1, 0, 2)
-    check(2, 0, 3)
-    check(0, 1, 3)
-    check(1, 1, 4)
-    check(2, 1, 4)
-    check(0, 2, 0)
-    check(1, 2, 0)
-    check(2, 2, 0)
+    check(0, 0, sequentialDest, 2)
+    check(0, 0, parallelDest, 2)
+    check(1, 0, sequentialDest, 2)
+    check(1, 0, parallelDest, 2)
+    check(2, 0, sequentialDest, 3)
+    check(2, 0, parallelDest, 3)
+    check(0, 1, sequentialDest, 3)
+    check(0, 1, parallelDest, 3)
+    check(1, 1, sequentialDest, 4)
+    check(1, 1, parallelDest, 4)
+    check(2, 1, sequentialDest, 4)
+    check(2, 1, parallelDest, 4)
+    check(0, 2, sequentialDest, 0)
+    check(0, 2, parallelDest, 0)
+    check(1, 2, sequentialDest, 0)
+    check(1, 2, parallelDest, 0)
+    check(2, 2, sequentialDest, 0)
+    check(2, 2, parallelDest, 0)
   }
 
   test("VerticalBoxBlur.blur and parBlur with radius 2 should correctly blur the entire " +
